@@ -1,0 +1,8 @@
+# Database Configuration
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+POSTGRES_DB=opswat_backend
+POSTGRES_USER=opswat_user
+POSTGRES_PASSWORD=cFQZQgjnySaW4wZ7oLcheFI6JcDkhtWyZAjSJFerbizKj2UCWdomPqlPUcKOApHL
+
+
