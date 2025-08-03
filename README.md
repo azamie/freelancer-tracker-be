@@ -60,6 +60,12 @@ OPSWAT Entrance Test - Django REST API application
    bin/manage.sh createsuperuser
    ```
 
-6. **Access the application**
+6. **Initialize fake data (development)**
+
+   ```bash
+   bin/manage.sh initialize_data
+   ```
+
+7. **Access the application**
    - API: http://localhost:8000
    - Admin: http://localhost:8000/admin

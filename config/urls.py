@@ -9,6 +9,7 @@ from django.views import defaults as default_views
 api_urlpatterns = [
     path("users/", include("opswat_backend.users.urls", namespace="users")),
     path("authentication/", include("authentication.urls", namespace="authentication")),
+    path("projects/", include("projects.urls", namespace="projects")),
 ]
 
 urlpatterns = [
