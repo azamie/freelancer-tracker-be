@@ -1,8 +1,7 @@
 import factory
 from factory import fuzzy
 from faker import Faker
-
-from opswat_backend.users.factories import UserFactory
+from users.factories import UserFactory
 
 from .models import Invoice
 from .models import Project

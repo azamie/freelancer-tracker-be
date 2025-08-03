@@ -1,3 +1,5 @@
+from activities.factories import GitHubActivityFactory
+from activities.factories import RepositoryFactory
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from projects.factories import InvoiceFactory
@@ -30,6 +32,18 @@ class Command(BaseCommand):
             type=int,
             default=3,
             help="Number of invoices to create per project (default: 3)",
+        )
+        parser.add_argument(
+            "--repositories-per-project",
+            type=int,
+            default=2,
+            help="Number of repositories to create per project (default: 2)",
+        )
+        parser.add_argument(
+            "--activities-per-repository",
+            type=int,
+            default=10,
+            help="Number of GitHub activities to create per repository (default: 10)",
         )
 
     def _initialize_projects(self, user, num_projects):
@@ -74,10 +88,40 @@ class Command(BaseCommand):
             for _ in range(invoices_per_project):
                 InvoiceFactory.create(project=project)
 
+    def _initialize_repositories(self, projects, repositories_per_project):
+        """Create fake repositories for the given projects."""
+        total_repositories = len(projects) * repositories_per_project
+        self.stdout.write(
+            f"Creating {total_repositories} repositories "
+            f"({repositories_per_project} per project)",
+        )
+
+        repositories = []
+        for project in projects:
+            for _ in range(repositories_per_project):
+                repository = RepositoryFactory.create(project=project)
+                repositories.append(repository)
+
+        return repositories
+
+    def _initialize_activities(self, repositories, activities_per_repository):
+        """Create fake GitHub activities for the given repositories."""
+        total_activities = len(repositories) * activities_per_repository
+        self.stdout.write(
+            f"Creating {total_activities} GitHub activities "
+            f"({activities_per_repository} per repository)",
+        )
+
+        for repository in repositories:
+            for _ in range(activities_per_repository):
+                GitHubActivityFactory.create(repository=repository)
+
     def handle(self, *args, **options):
         num_projects = options["projects"]
         tasks_per_project = options["tasks_per_project"]
         invoices_per_project = options["invoices_per_project"]
+        repositories_per_project = options["repositories_per_project"]
+        activities_per_repository = options["activities_per_repository"]
 
         self.stdout.write("Initializing fake data for the last user...")
 
@@ -93,6 +137,11 @@ class Command(BaseCommand):
             projects = self._initialize_projects(last_user, num_projects)
             self._initialize_tasks(projects, tasks_per_project)
             self._initialize_invoices(projects, invoices_per_project)
+            repositories = self._initialize_repositories(
+                projects,
+                repositories_per_project,
+            )
+            self._initialize_activities(repositories, activities_per_repository)
 
             self.stdout.write(
                 self.style.SUCCESS(
