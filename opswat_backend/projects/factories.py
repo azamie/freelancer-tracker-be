@@ -4,6 +4,7 @@ from faker import Faker
 
 from opswat_backend.users.factories import UserFactory
 
+from .models import Invoice
 from .models import Project
 from .models import Task
 
@@ -34,4 +35,14 @@ class TaskFactory(factory.django.DjangoModelFactory):
     task_type = fuzzy.FuzzyChoice([choice[0] for choice in Task.TaskType.choices])
     status = fuzzy.FuzzyChoice([choice[0] for choice in Task.Status.choices])
     description = factory.Faker("text", max_nb_chars=300)
+    project = factory.SubFactory(ProjectFactory)
+
+
+class InvoiceFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Invoice
+
+    amount = fuzzy.FuzzyDecimal(100.00, 5000.00, precision=2)
+    status = fuzzy.FuzzyChoice([choice[0] for choice in Invoice.Status.choices])
+    due_date = factory.Faker("future_datetime", end_date="+30d", tzinfo=None)
     project = factory.SubFactory(ProjectFactory)

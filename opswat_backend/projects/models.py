@@ -72,3 +72,36 @@ class Task(TimeStampedModel):
 
     def __str__(self):
         return f"{self.project.name} - {self.name}"
+
+
+class Invoice(TimeStampedModel):
+    class Status(models.TextChoices):
+        PENDING = "PENDING", "Pending"
+        PAID = "PAID", "Paid"
+        OVERDUE = "OVERDUE", "Overdue"
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.SET_NULL,
+        related_name="invoices",
+        null=True,
+        blank=True,
+    )
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.PENDING,
+    )
+    due_date = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        app_label = "projects"
+        ordering = ["-created"]
+
+    @property
+    def invoice_number(self):
+        return f"INV-{self.id:03d}"
+
+    def __str__(self):
+        return f"{self.invoice_number} - {self.project.name}"

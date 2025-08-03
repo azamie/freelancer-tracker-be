@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
+from projects.factories import InvoiceFactory
 from projects.factories import ProjectFactory
 from projects.factories import TaskFactory
 from projects.models import Project
@@ -23,6 +24,12 @@ class Command(BaseCommand):
             type=int,
             default=5,
             help="Number of tasks to create per project (default: 5)",
+        )
+        parser.add_argument(
+            "--invoices-per-project",
+            type=int,
+            default=3,
+            help="Number of invoices to create per project (default: 3)",
         )
 
     def _initialize_projects(self, user, num_projects):
@@ -56,9 +63,21 @@ class Command(BaseCommand):
                 else:
                     TaskFactory.create(project=project)
 
+    def _initialize_invoices(self, projects, invoices_per_project):
+        """Create fake invoices for the given projects."""
+        total_invoices = len(projects) * invoices_per_project
+        self.stdout.write(
+            f"Creating {total_invoices} invoices ({invoices_per_project} per project)",
+        )
+
+        for project in projects:
+            for _ in range(invoices_per_project):
+                InvoiceFactory.create(project=project)
+
     def handle(self, *args, **options):
         num_projects = options["projects"]
         tasks_per_project = options["tasks_per_project"]
+        invoices_per_project = options["invoices_per_project"]
 
         self.stdout.write("Initializing fake data for the last user...")
 
@@ -73,6 +92,7 @@ class Command(BaseCommand):
 
             projects = self._initialize_projects(last_user, num_projects)
             self._initialize_tasks(projects, tasks_per_project)
+            self._initialize_invoices(projects, invoices_per_project)
 
             self.stdout.write(
                 self.style.SUCCESS(
