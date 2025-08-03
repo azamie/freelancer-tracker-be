@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from projects.factories import ProjectFactory
+from projects.factories import TaskFactory
+from projects.models import Project
+from projects.models import Task
 
 User = get_user_model()
 
@@ -15,9 +18,14 @@ class Command(BaseCommand):
             default=5,
             help="Number of projects to create (default: 5)",
         )
+        parser.add_argument(
+            "--tasks-per-project",
+            type=int,
+            default=5,
+            help="Number of tasks to create per project (default: 5)",
+        )
 
     def _initialize_projects(self, user, num_projects):
-        """Create fake projects for the given user."""
         self.stdout.write(f"Creating {num_projects} projects for user: {user.email}")
 
         projects = []
@@ -27,8 +35,30 @@ class Command(BaseCommand):
 
         return projects
 
+    def _initialize_tasks(self, projects, tasks_per_project):
+        """Create fake tasks for the given projects."""
+        total_tasks = len(projects) * tasks_per_project
+        self.stdout.write(
+            f"Creating {total_tasks} tasks ({tasks_per_project} per project)",
+        )
+
+        for project in projects:
+            if project.status == Project.Status.UNSTARTED:
+                task_status = Task.Status.UNSTARTED
+            elif project.status == Project.Status.COMPLETED:
+                task_status = Task.Status.ACCEPTED
+            else:
+                task_status = None
+
+            for _ in range(tasks_per_project):
+                if task_status:
+                    TaskFactory.create(project=project, status=task_status)
+                else:
+                    TaskFactory.create(project=project)
+
     def handle(self, *args, **options):
         num_projects = options["projects"]
+        tasks_per_project = options["tasks_per_project"]
 
         self.stdout.write("Initializing fake data for the last user...")
 
@@ -41,7 +71,8 @@ class Command(BaseCommand):
                 )
                 return
 
-            self._initialize_projects(last_user, num_projects)
+            projects = self._initialize_projects(last_user, num_projects)
+            self._initialize_tasks(projects, tasks_per_project)
 
             self.stdout.write(
                 self.style.SUCCESS(

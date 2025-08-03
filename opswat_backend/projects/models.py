@@ -32,3 +32,43 @@ class Project(TimeStampedModel):
 
     def __str__(self):
         return self.name
+
+
+class Task(TimeStampedModel):
+    class TaskType(models.TextChoices):
+        CHORE = "CHORE", "Chore"
+        FEATURE = "FEATURE", "Feature"
+        BUG = "BUG", "Bug"
+
+    class Status(models.TextChoices):
+        UNSTARTED = "UNSTARTED", "Unstarted"
+        IN_PROGRESS = "IN_PROGRESS", "In Progress"
+        FINISHED = "FINISHED", "Finished"
+        DELIVERED = "DELIVERED", "Delivered"
+        ACCEPTED = "ACCEPTED", "Accepted"
+        REJECTED = "REJECTED", "Rejected"
+
+    project = models.ForeignKey(
+        Project,
+        on_delete=models.CASCADE,
+        related_name="tasks",
+    )
+    name = models.CharField(max_length=200)
+    task_type = models.CharField(
+        max_length=20,
+        choices=TaskType.choices,
+        default=TaskType.FEATURE,
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.UNSTARTED,
+    )
+    description = models.TextField(blank=True)
+
+    class Meta:
+        app_label = "projects"
+        ordering = ["-created"]
+
+    def __str__(self):
+        return f"{self.project.name} - {self.name}"

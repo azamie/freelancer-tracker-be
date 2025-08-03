@@ -5,6 +5,7 @@ from faker import Faker
 from opswat_backend.users.factories import UserFactory
 
 from .models import Project
+from .models import Task
 
 fake = Faker()
 
@@ -23,3 +24,14 @@ class ProjectFactory(factory.django.DjangoModelFactory):
         if obj.start_date
         else None,
     )
+
+
+class TaskFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = Task
+
+    name = factory.Faker("sentence", nb_words=3)
+    task_type = fuzzy.FuzzyChoice([choice[0] for choice in Task.TaskType.choices])
+    status = fuzzy.FuzzyChoice([choice[0] for choice in Task.Status.choices])
+    description = factory.Faker("text", max_nb_chars=300)
+    project = factory.SubFactory(ProjectFactory)
