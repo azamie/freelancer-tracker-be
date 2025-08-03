@@ -1,6 +1,19 @@
-# OPSWAT Backend
+# Freelancer Tracker
 
-OPSWAT Entrance Test - Django REST API application
+A comprehensive freelancer project management and tracking system built with Django REST Framework. This application provides a complete solution for managing freelance work, tracking project progress, monitoring development activities, and handling financial aspects of freelance business.
+
+## Database Schema
+
+![Database Schema](database-schema.png)
+
+## Key Features
+
+- **Project Management**: Track projects with status workflows and timelines
+- **Task Organization**: Break down work into categorized tasks (features, bugs, chores)
+- **Invoice Tracking**: Manage billing with automated numbering and payment status
+- **GitHub Integration**: Monitor repository activities and development progress
+- **RESTful API**: Complete REST endpoints for all functionality
+- **Email Authentication**: Secure user management without usernames
 
 [![Built with Cookiecutter Django](https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg?logo=cookiecutter)](https://github.com/cookiecutter/cookiecutter-django/)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
@@ -17,16 +30,11 @@ OPSWAT Entrance Test - Django REST API application
 
 1. **Clone the repository**
 
-   ```bash
-   git clone <repository-url>
-   cd opswat_backend
-   ```
-
 2. **Set up environment files**
 
    ```bash
    # Copy environment example files
-   cp .env.example .envs/local/.env
+   cp .env.example .env
    ```
 
    Edit the environment files if needed to customize settings.
@@ -67,5 +75,5 @@ OPSWAT Entrance Test - Django REST API application
    ```
 
 7. **Access the application**
-   - API: http://localhost:8000
+   - API: http://localhost:8000/api
    - Admin: http://localhost:8000/admin
