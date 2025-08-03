@@ -27,16 +27,13 @@ class LoginAPIView(APIView):
         user = authenticate(request, username=email, password=password)
 
         if user:
-            refresh = RefreshToken.for_user(user)
-            access_token = refresh.access_token
+            refresh_token = RefreshToken.for_user(user)
+            access_token = refresh_token.access_token
 
             response = Response(
                 {
-                    "message": "Login successful",
-                    "user": {
-                        "id": user.id,
-                        "email": user.email,
-                    },
+                    "access_token_expires_at": access_token.get("exp"),
+                    "refresh_token_expires_at": refresh_token.get("exp"),
                 },
                 status=status.HTTP_200_OK,
             )
@@ -52,7 +49,7 @@ class LoginAPIView(APIView):
             )
             response.set_cookie(
                 "refresh_token",
-                str(refresh),
+                str(refresh_token),
                 max_age=7 * 24 * 60 * 60,
                 httponly=True,
                 secure=False,
@@ -99,11 +96,14 @@ class RefreshTokenAPIView(APIView):
             )
 
         try:
-            refresh = RefreshToken(refresh_token)
-            access_token = refresh.access_token
+            refresh_token = RefreshToken(refresh_token)
+            access_token = refresh_token.access_token
 
             response = Response(
-                {"message": "Token refreshed successfully"},
+                {
+                    "access_token_expires_at": access_token.get("exp"),
+                    "refresh_token_expires_at": refresh_token.get("exp"),
+                },
                 status=status.HTTP_200_OK,
             )
 
@@ -111,6 +111,14 @@ class RefreshTokenAPIView(APIView):
                 "access_token",
                 str(access_token),
                 max_age=60 * 60,
+                httponly=True,
+                secure=False,
+                samesite="Lax",
+            )
+            response.set_cookie(
+                "refresh_token",
+                str(refresh_token),
+                max_age=7 * 24 * 60 * 60,
                 httponly=True,
                 secure=False,
                 samesite="Lax",
